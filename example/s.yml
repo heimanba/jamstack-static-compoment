@@ -1,7 +1,0 @@
-JAMSTACK_STATIC_Component:
-  Component: /Users/shihuali/workspace/jamstack-static-compoment/lib/index.js # 指向项目路径
-  Provider: alibaba
-  Access: test
-  Properties:
-    bucket: shl-testx
-    region: cn-hangzhou

@@ -1,5 +1,6 @@
 import OssClient from 'ali-oss';
 import { Logger } from '@serverless-devs/core';
+import { spawnSync } from 'child_process';
 
 const logger = new Logger('JAMSTACK_STATIC');
 export interface IOssConfig {
@@ -10,7 +11,7 @@ export interface IOssConfig {
 }
 export interface IDeployConfig {
   buildCommand: string;
-  publishDirectory: string;
+  publishDirectory?: string;
 }
 
 // 判断bucket是否存在
@@ -35,6 +36,18 @@ export default async (
   const isExistBucket = await getBucketInfo(bucket, ossClient);
   logger.debug(`bucket值${bucket}是否存在: ${isExistBucket}`);
   // 2. 执行打包指令
+  const result = await spawnSync(
+    deployConfig.buildCommand,
+    [],
+    {
+      cwd: process.cwd(),
+      stdio: 'inherit',
+      shell: true,
+    },
+  );
+  if (result && result.status !== 0) {
+    throw Error('> Execute Error');
+  }
 
   // 3. build文件打包成zip包
   zipBuildFile(deployConfig);

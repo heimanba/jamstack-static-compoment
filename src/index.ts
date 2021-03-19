@@ -1,6 +1,6 @@
 import { HLogger, ILogger } from '@serverless-devs/core';
 import get from 'lodash.get';
-import oss, { IOssConfig, IDeployConfig } from './deploy.server';
+import oss, { IOssConfig } from './deploy.server';
 
 export default class JamStackComponent {
   @HLogger('JAMSTACK_STATIC') logger: ILogger;
@@ -13,11 +13,7 @@ export default class JamStackComponent {
       accessKeyId: get(inputs, 'Credentials.AccessKeyID'),
       accessKeySecret: get(inputs, 'Credentials.AccessKeySecret'),
     };
-    const deployConfig: IDeployConfig = {
-      buildCommand: 'npm run build',
-      publishDirectory: 'dist',
-    };
-    await oss(ossConfig, deployConfig);
+    await oss(ossConfig, { buildCommand: get(inputs, 'Properties.buildCommand') });
   }
 
   async remove(inputs: any) {

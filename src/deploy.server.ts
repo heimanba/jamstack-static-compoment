@@ -1,30 +1,41 @@
 import OssClient from 'ali-oss';
+import { Logger } from '@serverless-devs/core';
 
-interface IOssConfig {
+const logger = new Logger('JAMSTACK_STATIC');
+export interface IOssConfig {
   bucket: string;
   region: string;
   accessKeyId: string;
   accessKeySecret: string;
 }
-
-interface IDeployConfig {
+export interface IDeployConfig {
   buildCommand: string;
   publishDirectory: string;
 }
 
-export default (
+// 判断bucket是否存在
+async function getBucketInfo(bucket: string, ossClient: OssClient) {
+  try {
+    return await ossClient.getBucketInfo(bucket);
+  } catch (error) {
+    return false;
+  }
+}
+
+export default async (
   { bucket, region, accessKeyId, accessKeySecret }: IOssConfig,
   deployConfig: IDeployConfig,
 ) => {
   // 1. 构造oss客户端
   const ossClient = new OssClient({
-    bucket,
     region: `oss-${region}`,
     accessKeyId,
     accessKeySecret,
   });
-  console.log(ossClient);
+  const isExistBucket = await getBucketInfo(bucket, ossClient);
+  logger.debug(`bucket值${bucket}是否存在: ${isExistBucket}`);
   // 2. 执行打包指令
+
   // 3. build文件打包成zip包
   zipBuildFile(deployConfig);
   // 4. 开启OSS上传

@@ -18,7 +18,7 @@ export default class JamStackComponent {
       buildCommand: get(inputs, 'Properties.deploy.buildCommand'),
       publishDirectory: get(inputs, 'Properties.deploy.publishDirectory'),
     };
-    await oss(ossConfig, deployConfig);
+    await oss(ossConfig, deployConfig, ProjectName);
     // 调用FC的函数的能力
     // const webFramework = await loadComponent('alibaba/web-framework');
     // return await webFramework.deploy(webFrameworkInputs);

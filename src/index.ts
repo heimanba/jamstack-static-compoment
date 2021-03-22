@@ -19,6 +19,9 @@ export default class JamStackComponent {
       publishDirectory: get(inputs, 'Properties.deploy.publishDirectory'),
     };
     await oss(ossConfig, deployConfig);
+    // 调用FC的函数的能力
+    // const webFramework = await loadComponent('alibaba/web-framework');
+    // return await webFramework.deploy(webFrameworkInputs);
   }
 
   async remove(inputs: any) {

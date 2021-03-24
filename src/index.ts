@@ -1,6 +1,8 @@
-import { HLogger, ILogger } from '@serverless-devs/core';
+import { HLogger, ILogger, loadComponent } from '@serverless-devs/core';
 import get from 'lodash.get';
+import cloneDeep from 'lodash.clonedeep';
 import oss, { IOssConfig, IDeployConfig } from './deploy.server';
+import { transfromInput } from './utils';
 
 export default class JamStackComponent {
   @HLogger('JAMSTACK_STATIC') logger: ILogger;
@@ -20,8 +22,9 @@ export default class JamStackComponent {
     };
     await oss(ossConfig, deployConfig, ProjectName);
     // 调用FC的函数的能力
-    // const webFramework = await loadComponent('alibaba/web-framework');
-    // return await webFramework.deploy(webFrameworkInputs);
+    const fcDeploy = await loadComponent('alibaba/fc-deploy');
+    const fcDeployInputs = await transfromInput(cloneDeep(inputs));
+    return await fcDeploy.deploy(fcDeployInputs);
   }
 
   async remove(inputs: any) {

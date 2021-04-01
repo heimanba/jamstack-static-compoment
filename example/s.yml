@@ -1,11 +1,11 @@
 JAMSTACK_STATIC_Component:
-  Component: /Users/shihuali/workspace/jamstack-static-compoment/lib/index.js # 指向项目路径
+  Component: /Users/yk/heimanba/aliFE/jmstack-proj/jamstack-static-compoment/lib/index.js # 指向项目路径
   Provider: alibaba
-  Access: common
+  Access: default
   Properties:
-    bucket: shl-test4
-    # region: cn-hangzhou
-    region: cn-beijing
+    bucket: cn-fun-package-template
+    region: cn-hangzhou
+    # region: cn-beijing
     deploy:
       buildCommand: npm run build
-      publishDirectory: build
+      publishDir: build

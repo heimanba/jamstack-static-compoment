@@ -13,14 +13,10 @@ export interface IOssConfig {
 }
 export interface IDeployConfig {
   buildCommand: string;
-  publishDirectory: string;
+  publishDir: string;
 }
 
-export default async (
-  ossConfig: IOssConfig,
-  deployConfig: IDeployConfig,
-  projectName: string,
-) => {
+export default async (ossConfig: IOssConfig, deployConfig: IDeployConfig, projectName: string) => {
   // 1. 执行打包指令
   await buildSpawnSync(deployConfig.buildCommand);
 
@@ -50,7 +46,10 @@ export default async (
 
   // 上传格式 ossClient.putStream('source/${projectName.zip}', 'build.zip');
   // stream方式上传 https://github.com/ali-sdk/ali-oss#putstreamname-stream-options
-  await ossClient.putStream(`source/${projectName}.zip`, fs.createReadStream(path.resolve(process.cwd(), 'build.zip')));
+  await ossClient.putStream(
+    `source/${projectName}.zip`,
+    fs.createReadStream(path.resolve(process.cwd(), 'build.zip')),
+  );
 
   // 删除build.zip文件
   await fs.unlink(path.resolve(process.cwd(), 'build.zip'));
@@ -73,15 +72,11 @@ async function getOrCreateBucket(ossClient: OssClient, bucket: string) {
 }
 
 async function buildSpawnSync(buildCommand: string) {
-  const result = await spawnSync(
-    buildCommand,
-    [],
-    {
-      cwd: process.cwd(),
-      stdio: 'inherit',
-      shell: true,
-    },
-  );
+  const result = await spawnSync(buildCommand, [], {
+    cwd: process.cwd(),
+    stdio: 'inherit',
+    shell: true,
+  });
   if (result && result.status !== 0) {
     throw Error('> Execute Error');
   }
@@ -89,8 +84,7 @@ async function buildSpawnSync(buildCommand: string) {
 
 async function zipBuildFile(deployConfig: IDeployConfig) {
   await zip({
-    codeUri: path.resolve(process.cwd(), deployConfig.publishDirectory),
+    codeUri: path.resolve(process.cwd(), deployConfig.publishDir),
     outputFileName: 'build.zip',
   });
 }
-

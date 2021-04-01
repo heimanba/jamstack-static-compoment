@@ -13,8 +13,8 @@ export default class JamStackComponent {
     const ossConfig: IOssConfig = {
       bucket: get(inputs, 'Properties.bucket'),
       region: get(inputs, 'Properties.region'),
-      accessKeyId: get(inputs, 'Credentials.AccessKeyID') || AccessKeyID,
-      accessKeySecret: get(inputs, 'Credentials.AccessKeySecret') || AccessKeySecret,
+      accessKeyId: get(inputs, 'Credentials.AccessKeyID', AccessKeyID),
+      accessKeySecret: get(inputs, 'Credentials.AccessKeySecret', AccessKeySecret),
     };
 
     const deployConfig: IDeployConfig = {
@@ -25,7 +25,7 @@ export default class JamStackComponent {
     // 调用FC的函数的能力
     const fcDeploy = await loadComponent('alibaba/fc-deploy');
     const fcDeployInputs = await transfromInput(cloneDeep(inputs));
-    console.log(fcDeployInputs, fcDeploy);
+    // console.log(fcDeployInputs, fcDeploy);
     return await fcDeploy.deploy(fcDeployInputs);
   }
 

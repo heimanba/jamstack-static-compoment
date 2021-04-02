@@ -58,6 +58,11 @@ export default async (ossConfig: IOssConfig, deployConfig: IDeployConfig, projec
 async function getOrCreateBucket(ossClient: OssClient, bucket: string) {
   try {
     await ossClient.getBucketInfo(bucket);
+    // bucket存在，检查权限，且只能设置为 公共读
+    const { acl } = await ossClient.getBucketACL(bucket);
+    if (acl !== 'public-read') {
+      await ossClient.putBucketACL(bucket, 'public-read');
+    }
   } catch (error) {
     if (error.code == 'NoSuchBucket') {
       const vm = spinner(`Create ${bucket} bucket`);

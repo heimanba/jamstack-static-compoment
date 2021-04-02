@@ -11,7 +11,7 @@ JAMSTACK_STATIC_Component:
     service:
       name: unzip-shl-test01-fc-deploy-service
       internetAccess: true
-      role: 'acs:ram::1172745866080237:role/unzip-file-1617266270747'
+      role: 'acs:ram::1172745866080237:role/unzip-file-1617331482782'
     function:
       name: oss-invoke-fc
       runtime: python3

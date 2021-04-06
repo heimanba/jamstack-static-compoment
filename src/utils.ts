@@ -1,4 +1,5 @@
 import get from 'lodash.get';
+import { IDomain } from './interface';
 
 export const transfromInput = async (inputs: any) => {
   const bucket = get(inputs, 'Properties.bucket');
@@ -41,4 +42,19 @@ export const transfromInput = async (inputs: any) => {
     ],
   };
   return inputs;
+};
+
+export const generateDomain = (domain: string): IDomain => {
+  const [first, second, thrid] = domain.split('.');
+  if (!thrid) {
+    return {
+      topDomain: `${first}.${second}`,
+      rrDomainName: null,
+    };
+  } else {
+    return {
+      topDomain: `${second}.${thrid}`,
+      rrDomainName: first,
+    };
+  }
 };

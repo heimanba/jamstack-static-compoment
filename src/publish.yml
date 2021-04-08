@@ -1,0 +1,95 @@
+Type: Component
+Name: website
+Version: 0.0.1
+Description: 阿里云静态资源组件，帮助您快速部署静态资源项目
+Category: 基础云服务
+Commands:
+  deploy: 部署静态资源项目
+  remove: 移除项目
+
+Properties:
+  staticPath:
+    description: 前端打包构建后的产物
+    required: false
+    default: build
+    type:
+      - String[简单配置]
+  bucket: # 每个项目一个bucket
+    description: OSS Bucket
+    required: false
+    default: 'serverless-devs-website-${uid}'
+    type:
+      - String
+  # version: TODO
+  #   description: 版本
+  #   required: false
+  #   default: latest
+  #   type:
+  #     - String
+  region:
+    description: 地域
+    required: false
+    default: cn-hangzhou
+    type:
+      - Enum:
+          - cn-beijing
+          - cn-hangzhou
+          - cn-shanghai
+          - cn-qingdao
+          - cn-zhangjiakou
+          - cn-huhehaote
+          - cn-shenzhen
+          - cn-chengdu
+          - cn-hongkong
+          - ap-southeast-1
+          - ap-southeast-2
+          - ap-southeast-3
+          - ap-southeast-5
+          - ap-northeast-1
+          - eu-central-1
+          - eu-west-1
+          - us-west-1
+          - us-east-1
+          - ap-south-1
+  domain:
+    description: 域名配置
+
+  pages:
+    description: 配置静态托管 # https://help.aliyun.com/document_detail/31962.html?spm=5176.10695662.1996646101.searchclickresult.2259558fTo7RTp#title-f9y-pq6-ksb
+    required: false
+    type:
+      - Struct:
+        index:
+          required: false
+          description: 默认首页
+          default: 'index.html'
+          type:
+            - String
+        error:
+          required: false
+          description: 默认 404 页
+          default: 'error.html'
+          type:
+            - String
+  cors:
+    description: 设置跨域资源共享规则  # https://help.aliyun.com/document_detail/142900.htm?spm=a2c4g.11186623.2.18.10db66ffviAcIU#section-jfv-uw1-ua4
+    required: false
+    type:
+      - Struct:
+        allowedOrigin:
+          description: 允许访问的域名
+          required: false
+          type:
+            - String
+            - Enum:
+              - "*"
+        allowedMethod:
+          description: 允许访问的域名
+          required: false
+          type:
+            - List<Enum>:
+              - GET
+              - PUT
+              - DELETE
+              - POST
+              - HEAD

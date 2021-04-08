@@ -30,6 +30,7 @@ export default class JamStackComponent {
   }
 
   async remove(inputs: any) {
+    // 删除所有用到的资源以及配置等
     console.log(inputs);
   }
 }

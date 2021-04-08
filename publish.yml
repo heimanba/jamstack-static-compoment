@@ -8,24 +8,19 @@ Commands:
   remove: 移除项目
 
 Properties:
+  bucket: # 每个项目一个bucket
+    description: OSS Bucket
+    required: true
+    type:
+      - String
+
   staticPath:
     description: 前端打包构建后的产物
     required: false
     default: build
     type:
       - String[简单配置]
-  bucket: # 每个项目一个bucket
-    description: OSS Bucket
-    required: false
-    default: 'serverless-devs-website-${uid}'
-    type:
-      - String
-  # version: TODO
-  #   description: 版本
-  #   required: false
-  #   default: latest
-  #   type:
-  #     - String
+
   region:
     description: 地域
     required: false
@@ -51,8 +46,12 @@ Properties:
           - us-west-1
           - us-east-1
           - ap-south-1
+
   domain:
     description: 域名配置
+    required: false
+    type:
+      - String
 
   pages:
     description: 配置静态托管 # https://help.aliyun.com/document_detail/31962.html?spm=5176.10695662.1996646101.searchclickresult.2259558fTo7RTp#title-f9y-pq6-ksb

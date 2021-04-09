@@ -1,7 +1,13 @@
 JAMSTACK_STATIC_Component:
-  Component: /Users/shihuali/workspace/jamstack-static-compoment/lib/src/index.js # 指向项目路径
+  Component: /Users/shihuali/workspace/jamstack-static-compoment/lib/index.js # 指向项目路径
   Provider: alibaba
   Access: my
+  # Extends:
+  #   deploy:
+  #     - Hook: npm run build
+  #       Path: ./
+  #       Pre: true
   Properties:
-    bucket: shl-test01
+    bucket: shl-test03
+    staticPath: ./build
     region: cn-beijing

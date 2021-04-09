@@ -7,7 +7,7 @@
     "@alicloud/cdn20180510": "^1.0.0",
     "@alicloud/openapi-client": "^0.3.3",
     "@alicloud/tea-typescript": "^1.7.1",
-    "@serverless-devs/core": "^0.0.40",
+    "@serverless-devs/core": "^0.0.51",
     "@types/express": "^4.17.11",
     "ali-oss": "^6.13.2",
     "fs-extra": "^9.1.0",

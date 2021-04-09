@@ -1,20 +1,12 @@
-import { HLogger, ILogger, loadComponent, getCredential } from '@serverless-devs/core';
+import { HLogger, ILogger, getCredential } from '@serverless-devs/core';
 import get from 'lodash.get';
-import cloneDeep from 'lodash.clonedeep';
-import oss, { IOssConfig, IDeployConfig } from './deploy.server';
-import { transfromInput } from './utils';
+import oss, { IOssConfig } from './deploy.server';
 
 export default class JamStackComponent {
   @HLogger('JAMSTACK_STATIC') logger: ILogger;
   async deploy(inputs: any) {
     const { ProjectName, Provider, AccessAlias } = inputs.Project;
     this.logger.debug(`[${ProjectName}] inputs params: ${JSON.stringify(inputs, null, 2)}`);
-
-    // 调用FC的函数的能力
-    const fcDeploy = await loadComponent('alibaba/fc-deploy');
-    const fcDeployInputs = await transfromInput(cloneDeep(inputs));
-    const result = await fcDeploy.deploy(fcDeployInputs);
-
     const { AccessKeyID, AccessKeySecret } = await getCredential(Provider, AccessAlias);
     const ossConfig: IOssConfig = {
       bucket: get(inputs, 'Properties.bucket'),
@@ -23,13 +15,7 @@ export default class JamStackComponent {
       accessKeySecret: get(inputs, 'Credentials.AccessKeySecret', AccessKeySecret),
     };
 
-    const deployConfig: IDeployConfig = {
-      buildCommand: get(inputs, 'Properties.deploy.buildCommand'),
-      publishDir: get(inputs, 'Properties.deploy.publishDir'),
-    };
-    await oss(ossConfig, deployConfig, ProjectName);
-
-    return result;
+    await oss(ossConfig, ProjectName);
   }
 
   async remove(inputs: any) {

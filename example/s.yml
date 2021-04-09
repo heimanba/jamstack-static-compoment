@@ -1,40 +1,7 @@
 JAMSTACK_STATIC_Component:
-  Component: /Users/shihuali/workspace/jamstack-static-compoment/lib/index.js
+  Component: /Users/shihuali/workspace/jamstack-static-compoment/lib/src/index.js # 指向项目路径
   Provider: alibaba
-  Access: common
+  Access: my
   Properties:
     bucket: shl-test01
     region: cn-beijing
-    deploy:
-      buildCommand: npm run build
-      publishDir: build
-    service:
-      name: unzip-shl-test01-fc-deploy-service
-      internetAccess: true
-      role: 'acs:ram::1172745866080237:role/unzip-file-1617331482782'
-    function:
-      name: oss-invoke-fc
-      runtime: python3
-      codeUri: ../oss-unzip
-      handler: index.handler
-      memorySize: 128
-      timeout: 60
-      instanceType: e1
-      environmentVariables:
-        PROCESSED_DIR: static
-        RETAIN_FILE_NAME: 'true'
-    triggers:
-      - name: ossTrigger
-        type: oss
-        config:
-          bucketName: shl-test01
-          events:
-            - 'oss:ObjectCreated:PutObject'
-            - 'oss:ObjectCreated:PostObject'
-            - 'oss:ObjectCreated:CompleteMultipartUpload'
-            - 'oss:ObjectCreated:PutSymlink'
-          filter:
-            Key:
-              Prefix: source/
-              Suffix: .zip
-        role: 'acs:ram::1172745866080237:role/fcdeploycreaterole-oss-invoke-fc'

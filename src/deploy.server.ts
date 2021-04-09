@@ -1,6 +1,5 @@
 import OssClient from 'ali-oss';
-import { zip, spinner } from '@serverless-devs/core';
-import { spawnSync } from 'child_process';
+import { spinner } from '@serverless-devs/core';
 import path from 'path';
 import fs from 'fs-extra';
 import { PUT_BUCKET_CORS } from './contants';
@@ -11,19 +10,9 @@ export interface IOssConfig {
   accessKeyId: string;
   accessKeySecret: string;
 }
-export interface IDeployConfig {
-  buildCommand: string;
-  publishDir: string;
-}
 
-export default async (ossConfig: IOssConfig, deployConfig: IDeployConfig, projectName: string) => {
-  // 1. 执行打包指令
-  await buildSpawnSync(deployConfig.buildCommand);
-
-  // 2. build文件打包成zip包
-  await zipBuildFile(deployConfig);
-
-  // 3. 开启OSS上传
+export default async (ossConfig: IOssConfig, projectName: string) => {
+  // 开启OSS上传
   const { bucket, region, accessKeyId, accessKeySecret } = ossConfig;
   // 构造oss客户端
   let ossClient = new OssClient({
@@ -44,15 +33,11 @@ export default async (ossConfig: IOssConfig, deployConfig: IDeployConfig, projec
     accessKeySecret,
   });
 
-  // 上传格式 ossClient.putStream('source/${projectName.zip}', 'build.zip');
   // stream方式上传 https://github.com/ali-sdk/ali-oss#putstreamname-stream-options
   await ossClient.putStream(
     `source/${projectName}.zip`,
-    fs.createReadStream(path.resolve(process.cwd(), 'build.zip')),
+    fs.createReadStream(path.resolve(process.cwd(), 'build/index.html')),
   );
-
-  // 删除build.zip文件
-  await fs.unlink(path.resolve(process.cwd(), 'build.zip'));
 };
 
 async function getOrCreateBucket(ossClient: OssClient, bucket: string) {
@@ -74,22 +59,4 @@ async function getOrCreateBucket(ossClient: OssClient, bucket: string) {
       throw error;
     }
   }
-}
-
-async function buildSpawnSync(buildCommand: string) {
-  const result = await spawnSync(buildCommand, [], {
-    cwd: process.cwd(),
-    stdio: 'inherit',
-    shell: true,
-  });
-  if (result && result.status !== 0) {
-    throw Error('> Execute Error');
-  }
-}
-
-async function zipBuildFile(deployConfig: IDeployConfig) {
-  await zip({
-    codeUri: path.resolve(process.cwd(), deployConfig.publishDir),
-    outputFileName: 'build.zip',
-  });
 }

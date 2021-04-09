@@ -5,17 +5,22 @@ import fs from 'fs-extra';
 import { PUT_BUCKET_CORS } from './contants';
 import walkSync from 'walk-sync';
 
+interface IPages {
+  index: string;
+  error?: string;
+}
 export interface IOssConfig {
   accessKeyId: string;
   accessKeySecret: string;
   bucket: string;
   region: string;
   staticPath: string;
+  pages: IPages;
 }
 
 export default async (ossConfig: IOssConfig) => {
   // 开启OSS上传
-  const { bucket, region, accessKeyId, accessKeySecret, staticPath } = ossConfig;
+  const { bucket, region, accessKeyId, accessKeySecret, staticPath, pages } = ossConfig;
   // 构造oss客户端
   let ossClient = new OssClient({
     bucket,
@@ -34,9 +39,11 @@ export default async (ossConfig: IOssConfig) => {
     accessKeyId,
     accessKeySecret,
   });
-
-  // stream方式上传 https://github.com/ali-sdk/ali-oss#putstreamname-stream-options
+  // 文件上传
   await put(ossClient, staticPath);
+
+  // 静态网站托管
+  await ossClient.putBucketWebsite(bucket, pages);
 };
 
 async function put(ossClient: OssClient, staticPath: string) {

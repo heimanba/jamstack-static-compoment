@@ -11,3 +11,6 @@ JAMSTACK_STATIC_Component:
     bucket: shl-test03
     staticPath: ./build
     region: cn-beijing
+    pages:
+      index: index.html
+      error: error.html

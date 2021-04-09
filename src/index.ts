@@ -9,11 +9,12 @@ export default class JamStackComponent {
     this.logger.debug(`[${ProjectName}] inputs params: ${JSON.stringify(inputs, null, 2)}`);
     const { AccessKeyID, AccessKeySecret } = await getCredential(AccessAlias);
     const ossConfig: IOssConfig = {
+      accessKeyId: get(inputs, 'Credentials.AccessKeyID', AccessKeyID),
+      accessKeySecret: get(inputs, 'Credentials.AccessKeySecret', AccessKeySecret),
       bucket: get(inputs, 'Properties.bucket'),
       region: get(inputs, 'Properties.region'),
       staticPath: get(inputs, 'Properties.staticPath', 'build'),
-      accessKeyId: get(inputs, 'Credentials.AccessKeyID', AccessKeyID),
-      accessKeySecret: get(inputs, 'Credentials.AccessKeySecret', AccessKeySecret),
+      pages: get(inputs, 'Properties.pages', { index: 'index.html' }),
     };
     await oss(ossConfig);
   }

@@ -110,7 +110,7 @@ async function getOrCreateBucket(ossClient: OssClient, bucket: string) {
       await ossClient.putBucketCORS(bucket, PUT_BUCKET_CORS);
       vm.succeed();
     } else {
-      console.log(error);
+      console.error(error);
     }
   }
 }

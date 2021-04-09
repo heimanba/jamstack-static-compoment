@@ -58,37 +58,37 @@ Properties:
     required: false
     type:
       - Struct:
-        index:
-          required: false
-          description: 默认首页
-          default: 'index.html'
-          type:
-            - String
-        error:
-          required: false
-          description: 默认 404 页
-          default: 'error.html'
-          type:
-            - String
+          index:
+            required: false
+            description: 默认首页
+            default: 'index.html'
+            type:
+              - String
+          error:
+            required: false
+            description: 默认 404 页
+            default: 'error.html'
+            type:
+              - String
   cors:
     description: 设置跨域资源共享规则  # https://help.aliyun.com/document_detail/142900.htm?spm=a2c4g.11186623.2.18.10db66ffviAcIU#section-jfv-uw1-ua4
     required: false
     type:
       - Struct:
-        allowedOrigin:
-          description: 允许访问的域名
-          required: false
-          type:
-            - String
-            - Enum:
-              - "*"
-        allowedMethod:
-          description: 允许访问的域名
-          required: false
-          type:
-            - List<Enum>:
-              - GET
-              - PUT
-              - DELETE
-              - POST
-              - HEAD
+          allowedOrigin:
+            description: 允许访问的域名
+            required: false
+            type:
+              - String
+              - Enum:
+                - "*"
+          allowedMethod:
+            description: 允许访问的域名
+            required: false
+            type:
+              - List<String>:
+                - GET
+                - PUT
+                - DELETE
+                - POST
+                - HEAD

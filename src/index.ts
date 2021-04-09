@@ -15,6 +15,7 @@ export default class JamStackComponent {
       region: get(inputs, 'Properties.region'),
       staticPath: get(inputs, 'Properties.staticPath', 'build'),
       pages: get(inputs, 'Properties.pages', { index: 'index.html' }),
+      cors: get(inputs, 'Properties.cors'),
     };
     await oss(ossConfig);
   }

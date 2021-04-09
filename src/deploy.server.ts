@@ -9,6 +9,11 @@ interface IPages {
   index: string;
   error?: string;
 }
+
+interface ICors {
+  allowedOrigin: string | string[];
+  allowedMethod: string | string[];
+}
 export interface IOssConfig {
   accessKeyId: string;
   accessKeySecret: string;
@@ -16,11 +21,12 @@ export interface IOssConfig {
   region: string;
   staticPath: string;
   pages: IPages;
+  cors: ICors;
 }
 
 export default async (ossConfig: IOssConfig) => {
   // 开启OSS上传
-  const { bucket, region, accessKeyId, accessKeySecret, staticPath, pages } = ossConfig;
+  const { bucket, region, accessKeyId, accessKeySecret, staticPath, pages, cors } = ossConfig;
   // 构造oss客户端
   let ossClient = new OssClient({
     bucket,
@@ -42,8 +48,13 @@ export default async (ossConfig: IOssConfig) => {
   // 文件上传
   await put(ossClient, staticPath);
 
-  // 静态网站托管
+  // 配置静态托管
   await ossClient.putBucketWebsite(bucket, pages);
+
+  // 设置跨域资源共享规则
+  if (cors) {
+    await ossClient.putBucketCORS(bucket, [cors]);
+  }
 };
 
 async function put(ossClient: OssClient, staticPath: string) {
@@ -51,10 +62,15 @@ async function put(ossClient: OssClient, staticPath: string) {
   for (const p of paths) {
     const fillPath = path.resolve(staticPath, p);
     const stat = fs.statSync(fillPath);
-    if (!stat.isDirectory()) {
+    if (stat.isFile()) {
       const spin = spinner(`上传 ${p}`);
-      await ossClient.put(p, fillPath);
-      spin.succeed();
+      try {
+        await ossClient.put(p, fillPath);
+        spin.succeed();
+      } catch (error) {
+        spin.fail();
+        console.error(error);
+      }
     }
   }
 }

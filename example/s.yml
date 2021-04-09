@@ -17,3 +17,6 @@ JAMSTACK_STATIC_Component:
     cors:
       allowedOrigin: '*'
       allowedMethod: ['GET']
+    referer:
+      allowEmpty: true
+      referers: ['100.67.79.188', '140.205.215.168']

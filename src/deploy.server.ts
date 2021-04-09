@@ -11,8 +11,13 @@ interface IPages {
 }
 
 interface ICors {
-  allowedOrigin: string | string[];
-  allowedMethod: string | string[];
+  allowedOrigin: string[];
+  allowedMethod: string[];
+}
+
+interface IReferer {
+  allowEmpty: boolean;
+  referers: string[];
 }
 export interface IOssConfig {
   accessKeyId: string;
@@ -22,11 +27,21 @@ export interface IOssConfig {
   staticPath: string;
   pages: IPages;
   cors: ICors;
+  referer: IReferer;
 }
 
 export default async (ossConfig: IOssConfig) => {
   // 开启OSS上传
-  const { bucket, region, accessKeyId, accessKeySecret, staticPath, pages, cors } = ossConfig;
+  const {
+    bucket,
+    region,
+    accessKeyId,
+    accessKeySecret,
+    staticPath,
+    pages,
+    cors,
+    referer,
+  } = ossConfig;
   // 构造oss客户端
   let ossClient = new OssClient({
     bucket,
@@ -55,6 +70,9 @@ export default async (ossConfig: IOssConfig) => {
   if (cors) {
     await ossClient.putBucketCORS(bucket, [cors]);
   }
+
+  // HTTP Referer 白名单配置，用于防止他人盗用 OSS 数据
+  await ossClient.putBucketReferer(bucket, referer.allowEmpty, referer.referers);
 };
 
 async function put(ossClient: OssClient, staticPath: string) {
@@ -85,7 +103,6 @@ async function getOrCreateBucket(ossClient: OssClient, bucket: string) {
       await ossClient.putBucketACL(bucket, 'public-read');
     }
   } catch (error) {
-    // TODO: AccessDenied case
     if (error.code == 'NoSuchBucket') {
       const vm = spinner(`Create ${bucket} bucket`);
       await ossClient.putBucket(bucket);
@@ -93,7 +110,7 @@ async function getOrCreateBucket(ossClient: OssClient, bucket: string) {
       await ossClient.putBucketCORS(bucket, PUT_BUCKET_CORS);
       vm.succeed();
     } else {
-      throw error;
+      console.log(error);
     }
   }
 }

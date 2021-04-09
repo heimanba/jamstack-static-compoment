@@ -16,6 +16,7 @@ export default class JamStackComponent {
       staticPath: get(inputs, 'Properties.staticPath', 'build'),
       pages: get(inputs, 'Properties.pages', { index: 'index.html' }),
       cors: get(inputs, 'Properties.cors'),
+      referer: get(inputs, 'Properties.referer', { allowEmpty: true, referers: [] }),
     };
     await oss(ossConfig);
   }

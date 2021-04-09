@@ -77,14 +77,12 @@ Properties:
       - Struct:
           allowedOrigin:
             description: 允许访问的域名
-            required: false
+            required: true
             type:
-              - String
-              - Enum:
-                - "*"
+              - List<String>
           allowedMethod:
             description: 允许访问的域名
-            required: false
+            required: true
             type:
               - List<String>:
                 - GET
@@ -92,3 +90,19 @@ Properties:
                 - DELETE
                 - POST
                 - HEAD
+  referer:
+    description: HTTP Referer 白名单配置，用于防止他人盗用 OSS 数据
+    required: false
+    type:
+      - Struct:
+          allowEmpty:
+            description: 是否允许 空Referer
+            required: false
+            default: true
+            type:
+              - Boolean
+          referers:
+            description: Referer为域名和IP地址
+            required: false
+            type:
+              - List<String>

@@ -75,3 +75,26 @@ export const generateDomain = (domain: string): IDomain => {
     };
   }
 };
+
+export function sleep(msec) {
+  return new Promise((resolve) => setTimeout(resolve, msec));
+}
+
+// export const waitForComplete = async (asyncFun, completeFun, timeout?: number) => {
+//   let countTime = 0;
+//   let result = null;
+//   return new Promise((reslove, reject) => {
+//     const timehandler = setTimeout(async () => {
+//       result = await asyncFun();
+//       if (completeFun(result)) {
+//         reslove(result);
+//         clearTimeout(timehandler);
+//       }
+//       countTime += 200;
+//       if (countTime >= timeout) {
+//         clearTimeout(timehandler);
+//         reject(result);
+//       }
+//     }, 350);
+//   });
+// };

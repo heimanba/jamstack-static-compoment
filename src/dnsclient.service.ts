@@ -42,11 +42,7 @@ export default class Client {
     return new Alidns20150109(config);
   }
 
-  static async addDomainRecord(
-    credentials: ICredentials,
-    addDomainRecordParams: IAddDomainRecord,
-  ): Promise<any> {
-    const client = Client.createClient(credentials);
+  static async addDomainRecord(client, addDomainRecordParams: IAddDomainRecord): Promise<any> {
     const addDomainRecordRequest = new $Alidns20150109.AddDomainRecordRequest(
       addDomainRecordParams,
     );
@@ -54,4 +50,15 @@ export default class Client {
     const result = await client.addDomainRecord(addDomainRecordRequest);
     return result;
   }
+
+  // static async removeCDNDomain(client, domain: string): Promise<void> {
+  //   const deleteDomainRequest = new $Alidns20150109.DeleteDomainRequest({ domainName: domain });
+  //   // 复制代码运行请自行打印 API 的返回值
+  //   try {
+  //     await client.deleteDomain(deleteDomainRequest);
+  //   } catch (error) {
+  //     console.log(error);
+  //     // 删除域名不影响正常流程
+  //   }
+  // }
 }

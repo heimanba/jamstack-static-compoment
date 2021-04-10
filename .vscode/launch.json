@@ -6,7 +6,7 @@
           "type": "node",
           "request": "launch",
           "args": [
-            "${workspaceRoot}/src/index"
+            "${workspaceRoot}/test/fixtures/cdn.test.ts"
           ],
           "runtimeArgs": [
             "--nolazy",

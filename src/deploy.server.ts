@@ -1,30 +1,47 @@
 import OssClient from 'ali-oss';
-import { zip, spinner } from '@serverless-devs/core';
-import { spawnSync } from 'child_process';
+import { spinner } from '@serverless-devs/core';
 import path from 'path';
 import fs from 'fs-extra';
 import { PUT_BUCKET_CORS } from './contants';
+import walkSync from 'walk-sync';
 
+interface IPages {
+  index: string;
+  error?: string;
+}
+
+interface ICors {
+  allowedOrigin: string[];
+  allowedMethod: string[];
+}
+
+interface IReferer {
+  allowEmpty: boolean;
+  referers: string[];
+}
 export interface IOssConfig {
-  bucket: string;
-  region: string;
   accessKeyId: string;
   accessKeySecret: string;
+  bucket: string;
+  region: string;
+  staticPath: string;
+  pages: IPages;
+  cors: ICors;
+  referer: IReferer;
 }
-export interface IDeployConfig {
-  buildCommand: string;
-  publishDir: string;
-}
 
-export default async (ossConfig: IOssConfig, deployConfig: IDeployConfig, projectName: string) => {
-  // 1. 执行打包指令
-  await buildSpawnSync(deployConfig.buildCommand);
-
-  // 2. build文件打包成zip包
-  await zipBuildFile(deployConfig);
-
-  // 3. 开启OSS上传
-  const { bucket, region, accessKeyId, accessKeySecret } = ossConfig;
+export default async (ossConfig: IOssConfig) => {
+  // 开启OSS上传
+  const {
+    bucket,
+    region,
+    accessKeyId,
+    accessKeySecret,
+    staticPath,
+    pages,
+    cors,
+    referer,
+  } = ossConfig;
   // 构造oss客户端
   let ossClient = new OssClient({
     bucket,
@@ -43,23 +60,45 @@ export default async (ossConfig: IOssConfig, deployConfig: IDeployConfig, projec
     accessKeyId,
     accessKeySecret,
   });
+  // 文件上传
+  await put(ossClient, staticPath);
 
-  // 上传格式 ossClient.putStream('source/${projectName.zip}', 'build.zip');
-  // stream方式上传 https://github.com/ali-sdk/ali-oss#putstreamname-stream-options
-  await ossClient.putStream(
-    `source/${projectName}.zip`,
-    fs.createReadStream(path.resolve(process.cwd(), 'build.zip')),
-  );
+  // 配置静态托管
+  await ossClient.putBucketWebsite(bucket, pages);
 
-  // 删除build.zip文件
-  await fs.unlink(path.resolve(process.cwd(), 'build.zip'));
+  // 设置跨域资源共享规则
+  if (cors) {
+    await ossClient.putBucketCORS(bucket, [cors]);
+  }
+
+  // HTTP Referer 白名单配置，用于防止他人盗用 OSS 数据
+  await ossClient.putBucketReferer(bucket, referer.allowEmpty, referer.referers);
 };
+
+async function put(ossClient: OssClient, staticPath: string) {
+  const paths = walkSync(staticPath);
+  for (const p of paths) {
+    const fillPath = path.resolve(staticPath, p);
+    const stat = fs.statSync(fillPath);
+    if (stat.isFile()) {
+      const spin = spinner(`上传 ${p}`);
+      try {
+        await ossClient.put(p, fillPath);
+        spin.succeed();
+      } catch (error) {
+        spin.fail();
+        console.error(error);
+      }
+    }
+  }
+}
 
 async function getOrCreateBucket(ossClient: OssClient, bucket: string) {
   try {
     await ossClient.getBucketInfo(bucket);
     // bucket存在，检查权限，且只能设置为 公共读
     const { acl } = await ossClient.getBucketACL(bucket);
+
     if (acl !== 'public-read') {
       await ossClient.putBucketACL(bucket, 'public-read');
     }
@@ -71,25 +110,7 @@ async function getOrCreateBucket(ossClient: OssClient, bucket: string) {
       await ossClient.putBucketCORS(bucket, PUT_BUCKET_CORS);
       vm.succeed();
     } else {
-      throw error;
+      console.error(error);
     }
   }
-}
-
-async function buildSpawnSync(buildCommand: string) {
-  const result = await spawnSync(buildCommand, [], {
-    cwd: process.cwd(),
-    stdio: 'inherit',
-    shell: true,
-  });
-  if (result && result.status !== 0) {
-    throw Error('> Execute Error');
-  }
-}
-
-async function zipBuildFile(deployConfig: IDeployConfig) {
-  await zip({
-    codeUri: path.resolve(process.cwd(), deployConfig.publishDir),
-    outputFileName: 'build.zip',
-  });
 }
